@@ -309,6 +309,23 @@ img {
     margin-right: 0.5rem;
 }
 
+/* Tooltip dịch */
+.translation-tooltip {
+    display: none;
+    position: absolute;
+    background: var(--hint-bg);
+    color: var(--primary-color);
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-width: 300px;
+    font-size: 1rem;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+}
+
 /* Responsive */
 @media (min-width: 768px) {
     body {
@@ -357,6 +374,10 @@ img {
     }
     #result {
         font-size: 1.25rem;
+    }
+    .translation-tooltip {
+        font-size: 1.125rem;
+        max-width: 400px;
     }
 }
 
@@ -410,5 +431,9 @@ img {
     }
     #result {
         font-size: 1rem;
+    }
+    .translation-tooltip {
+        font-size: 0.875rem;
+        max-width: 250px;
     }
 }

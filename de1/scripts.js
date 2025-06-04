@@ -2,6 +2,129 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tùy chọn tĩnh cho Leseverstehen Teil 3
     const options = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'X'];
 
+    // Mã hóa API keys (Base64)
+    const encodedApiKeys = [
+        'QUl6YVN5RHRuWng0U0RZcTQ0WmY2MVlPSnBndHhaVDhlT3dobzlJ', // Key 1
+        'QUl6YVN5Q1hjT2pRcUlvX3FJVEgxY2k5SWUtdGU2alExRjJlR2Zv', // Key 2
+        'QUl6YVN5Q2xUcjlBWFdGMVNycURFaVY2TzVCdzFBLVhTaURPOUdR'  // Key 3
+    ].map(key => atob(key)); // Giải mã Base64 khi sử dụng
+
+    // Cấu hình API
+    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent';
+    const TIMEOUT_MS = 5000; // Timeout 5 giây
+    let currentKeyIndex = 0; // Chỉ số key hiện tại
+    const failedKeys = new Set(); // Lưu key thất bại
+    const translationCache = new Map(); // Cache bản dịch
+
+    // Tooltip cho bản dịch
+    const translationTooltip = document.createElement('div');
+    translationTooltip.id = 'translation-tooltip';
+    translationTooltip.className = 'translation-tooltip';
+    document.body.appendChild(translationTooltip);
+
+    // Hàm gọi API với timeout
+    async function fetchWithTimeout(url, options) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), TIMEOUT_MS);
+        try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+            throw error;
+        }
+    }
+
+    // Hàm thử API với key hiện tại, chuyển key nếu lỗi
+    async function tryTranslateWithKey(text) {
+        if (failedKeys.size >= encodedApiKeys.length) {
+            return 'Lỗi: Tất cả API key không khả dụng. Vui lòng thử lại sau.';
+        }
+
+        const apiKey = encodedApiKeys[currentKeyIndex];
+        try {
+            const response = await fetchWithTimeout(`${GEMINI_API_URL}?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Bạn là chuyên gia dịch thuật từ Tiếng Đức sang Tiếng Việt, vì vậy chỉ đưa ra nghĩa Tiếng Việt chính xác 1:1 như từ điển không giải thích gì thêm(có thể đưa ra thêm một vài nghĩa) cho từ Tiếng Đức "${text}"`
+                        }]
+                    }],
+                    generationConfig: {
+                        maxOutputTokens: 512,
+                        temperature: 0.2 // Độ sáng tạo thấp để dịch sát nghĩa
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                if (response.status === 429) {
+                    failedKeys.add(currentKeyIndex);
+                    currentKeyIndex = (currentKeyIndex + 1) % encodedApiKeys.length;
+                    return tryTranslateWithKey(text); // Thử key tiếp theo
+                } else if (response.status === 401) {
+                    failedKeys.add(currentKeyIndex);
+                    currentKeyIndex = (currentKeyIndex + 1) % encodedApiKeys.length;
+                    return tryTranslateWithKey(text); // Thử key tiếp theo nếu 401
+                }
+                throw new Error(`API error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const translation = data.candidates[0].content.parts[0].text.trim();
+            translationCache.set(text, translation); // Lưu cache
+            return translation;
+        } catch (error) {
+            if (error.name === 'AbortError' || error.message.includes('network')) {
+                failedKeys.add(currentKeyIndex);
+                currentKeyIndex = (currentKeyIndex + 1) % encodedApiKeys.length;
+                return tryTranslateWithKey(text); // Thử key tiếp theo
+            }
+            return `Lỗi: Không thể dịch (${error.message}).`;
+        }
+    }
+
+    // Hàm dịch văn bản
+    async function translateText(text) {
+        if (text.length < 2) return '';
+        // Kiểm tra cache
+        if (translationCache.has(text)) {
+            return translationCache.get(text);
+        }
+        return tryTranslateWithKey(text);
+    }
+
+    // Xử lý bôi đen văn bản
+    document.addEventListener('mouseup', async (e) => {
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+        if (selectedText && selectedText.length >= 2) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            translationTooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            translationTooltip.style.left = `${rect.left + window.scrollX}px`;
+            translationTooltip.textContent = 'Đang dịch...';
+            translationTooltip.style.display = 'block';
+
+            const translation = await translateText(selectedText);
+            translationTooltip.textContent = translation;
+        } else {
+            translationTooltip.style.display = 'none';
+        }
+    });
+
+    // Ẩn tooltip khi click ra ngoài
+    document.addEventListener('mousedown', (e) => {
+        if (!translationTooltip.contains(e.target)) {
+            translationTooltip.style.display = 'none';
+        }
+    });
+
     fetch('test.json')
         .then(response => {
             if (!response.ok) {
@@ -16,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
                 questionDiv.innerHTML = `
-                    <p class="content"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
+                    <p class="font-medium"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
                     <div class="option-grid">
                         ${data.leseverstehen_teil1.overschriften.map((opt, optIdx) => `
                             <label>
@@ -53,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Leseverstehen Teil 3
             const teil3Image = document.getElementById('leseverstehen_teil3_image');
-            teil3Image.src = `/de/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
+            teil3Image.src = `/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
             const teil3Div = document.getElementById('leseverstehen_teil3_situations');
             data.leseverstehen_teil3.situations.forEach((situation, index) => {
                 const questionDiv = document.createElement('div');
@@ -186,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (selected === data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)]) {
                         score++;
                         questionDiv.classList.add('correct');
-                        document.getElementById(`sprach2_${i + 31}`).textContent = data.sprachbausteine_teil2.options[data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)].charCodeAt(0) - 65];
+                        document.getElementById(`sprach2_${i + 31}`).textContent = data.sprachbausteine_teil1.options[i][data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)].charCodeAt(0) - 65];
                     } else {
                         questionDiv.classList.add('incorrect');
                         document.getElementById(`sprach2_${i + 31}`).textContent = selected ? data.sprachbausteine_teil2.options[selected.charCodeAt(0) - 65] : '';
