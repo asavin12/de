@@ -17,22 +17,7 @@ def setup_leseverstehen_teil1(app):
     main_frame = tk.Frame(app.leseverstehen_teil1)
     main_frame.pack(pady=10, fill="both", expand=True)
 
-    # Texts
-    text_frame = tk.Frame(main_frame)
-    text_frame.pack(side=tk.LEFT, padx=10)
-    tk.Label(text_frame, text="5 đoạn văn (Text 1-5):").pack()
-    app.teil1_texts = []
-    for i in range(5):
-        frame = tk.Frame(text_frame)
-        frame.pack(fill="x", pady=2)
-        tk.Label(frame, text=f"Text {i+1}:").pack(side=tk.LEFT)
-        text = tk.Text(frame, height=3, width=30, highlightthickness=0)
-        text.pack(side=tk.LEFT, padx=5)
-        text.bind('<Double-Button-1>', lambda event, w=text: app.set_current_field(w))
-        app.teil1_texts.append(text)
-        app.teil1_focus.append(text)
-
-    # Überschriften
+    # Überschriften (hiển thị bên trái)
     uberschriften_frame = tk.Frame(main_frame)
     uberschriften_frame.pack(side=tk.LEFT, padx=10)
     tk.Label(uberschriften_frame, text="10 Überschriften (a-j):").pack()
@@ -45,7 +30,27 @@ def setup_leseverstehen_teil1(app):
         entry.pack(side=tk.LEFT, padx=5)
         entry.bind('<Double-Button-1>', lambda event, w=entry: app.set_current_field(w))
         app.teil1_overschriften.append(entry)
-        app.teil1_focus.append(entry)
+
+    # Texts (hiển thị bên phải)
+    text_frame = tk.Frame(main_frame)
+    text_frame.pack(side=tk.LEFT, padx=10)
+    tk.Label(text_frame, text="5 đoạn văn (Text 1-5):").pack()
+    app.teil1_texts = []
+    for i in range(5):
+        frame = tk.Frame(text_frame)
+        frame.pack(fill="x", pady=2)
+        tk.Label(frame, text=f"Text {i+1}:").pack(side=tk.LEFT)
+        text = tk.Text(frame, height=3, width=30, highlightthickness=0)
+        text.pack(side=tk.LEFT, padx=5)
+        text.bind('<Double-Button-1>', lambda event, w=text: app.set_current_field(w))
+        app.teil1_texts.append(text)
+
+    # Thiết lập thứ tự focus: Überschriften trước, Texts sau
+    app.teil1_focus = []
+    app.teil1_focus.extend(app.teil1_overschriften)  # Thêm Überschriften đầu tiên
+    app.teil1_focus.extend(app.teil1_texts)  # Thêm Texts sau
+    if app.teil1_focus:
+        app.set_current_field(app.teil1_focus[0])  # Focus vào ô Überschriften đầu tiên (a)
 
 def setup_leseverstehen_teil2(app):
     main_frame = tk.Frame(app.leseverstehen_teil2)
@@ -131,7 +136,6 @@ def setup_sprachbausteine_teil1(app):
 
     # Questions (không hiển thị trong UI, chỉ giữ cho JSON)
     app.teil1_sprach_questions = [""] * 10
-    app.teil1_sprach_options = []
     logging.info("Removed question fields from UI in Sprachbausteine Teil 1")
 
     # Dòng 1: Câu 21-25

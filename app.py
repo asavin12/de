@@ -37,6 +37,10 @@ class TELCJsonApp:
         # Biến cho Leseverstehen, Teil 3
         self.teil3_image_path = tk.StringVar()
 
+        # Khởi tạo các thuộc tính cho Sprachbausteine
+        self.teil1_sprach_options = []  # Khởi tạo danh sách options cho Teil 1
+        self.teil2_sprach_options = []  # Khởi tạo danh sách options cho Teil 2
+
         # File name và các nút
         file_frame = tk.Frame(root)
         file_frame.pack(pady=5, fill="x")
@@ -139,7 +143,7 @@ class TELCJsonApp:
         read_json(self)
 
     def edit_json_button(self):
-        """Xử lý nút Chỉnh sửa JSON"""
+        """Xử lý nút chỉnh sửa JSON"""
         logging.info("Button 'Chỉnh sửa JSON' clicked")
         edit_json(self)
 
