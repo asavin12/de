@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
                 questionDiv.innerHTML = `
-                    <p class="font-medium"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
+                    <p class="content"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
                     <div class="option-grid">
                         ${data.leseverstehen_teil1.overschriften.map((opt, optIdx) => `
                             <label>
