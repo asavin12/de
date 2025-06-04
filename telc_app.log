@@ -1,0 +1,98 @@
+2025-06-03 19:12:17,311 - DEBUG - Initializing TELCJsonApp
+2025-06-03 19:12:17,324 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:12:17,340 - INFO - Removed question fields from UI in Sprachbausteine Teil 1
+2025-06-03 19:12:17,351 - INFO - Removed question fields from UI in Sprachbausteine Teil 2
+2025-06-03 19:12:17,368 - DEBUG - Tkinter K binding successful
+2025-06-03 19:12:17,374 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:12:17,378 - DEBUG - Updated focus order for tab 0
+2025-06-03 19:12:17,418 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.102:5000
+2025-06-03 19:12:17,486 - INFO - [33mPress CTRL+C to quit[0m
+2025-06-03 19:12:17,618 - DEBUG - Global K binding successful
+2025-06-03 19:12:25,516 - INFO - Button 'Tạo và lưu JSON' clicked
+2025-06-03 19:12:25,522 - INFO - Created JSON file: test.json, 134 empty fields
+2025-06-03 19:12:25,535 - DEBUG - Empty fields details: Leseverstehen Teil 1: 5 empty texts; Leseverstehen Teil 1: 10 empty overschriften; Leseverstehen Teil 2: empty content; Leseverstehen Teil 2: 5 empty questions; Leseverstehen Teil 2: 15 empty options; Leseverstehen Teil 3: 10 empty situations; Leseverstehen Teil 3: empty image_path; Sprachbausteine Teil 1: empty content; Sprachbausteine Teil 1: 30 empty options; Sprachbausteine Teil 2: empty content; Sprachbausteine Teil 2: 15 empty options; Answers: 40 empty answers
+2025-06-03 19:13:01,381 - DEBUG - Initializing TELCJsonApp
+2025-06-03 19:13:01,394 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:13:01,406 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.102:5000
+2025-06-03 19:13:01,411 - INFO - [33mPress CTRL+C to quit[0m
+2025-06-03 19:13:01,416 - INFO - Removed question fields from UI in Sprachbausteine Teil 1
+2025-06-03 19:13:01,425 - INFO - Removed question fields from UI in Sprachbausteine Teil 2
+2025-06-03 19:13:01,439 - DEBUG - Tkinter K binding successful
+2025-06-03 19:13:01,446 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:01,451 - DEBUG - Updated focus order for tab 0
+2025-06-03 19:13:01,707 - DEBUG - Global K binding successful
+2025-06-03 19:13:02,756 - INFO - Button 'Mở JSON' clicked
+2025-06-03 19:13:10,404 - INFO - Loaded JSON file: C:/Users/Hai/Desktop/dethib1/test.json
+2025-06-03 19:13:12,748 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:12,753 - DEBUG - Updated focus order for tab 1
+2025-06-03 19:13:13,811 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:13:13,820 - DEBUG - Updated focus order for tab 2
+2025-06-03 19:13:14,663 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:14,672 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:13:15,046 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:15,054 - DEBUG - Updated focus order for tab 4
+2025-06-03 19:13:15,581 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:15,590 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:13:21,182 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:21,190 - DEBUG - Updated focus order for tab 4
+2025-06-03 19:13:21,616 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:13:21,625 - DEBUG - Updated focus order for tab 5
+2025-06-03 19:13:22,580 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:22,588 - DEBUG - Updated focus order for tab 4
+2025-06-03 19:13:23,689 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:23,698 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:13:24,089 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:13:24,098 - DEBUG - Updated focus order for tab 2
+2025-06-03 19:13:25,046 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:25,054 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:13:27,746 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:27,753 - DEBUG - Updated focus order for tab 0
+2025-06-03 19:13:30,091 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:30,099 - DEBUG - Updated focus order for tab 1
+2025-06-03 19:13:30,462 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:13:30,470 - DEBUG - Updated focus order for tab 2
+2025-06-03 19:13:30,851 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:30,860 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:13:33,796 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:13:33,805 - DEBUG - Updated focus order for tab 4
+2025-06-03 19:13:36,560 - INFO - Button 'Chỉnh sửa JSON' clicked
+2025-06-03 19:13:36,572 - INFO - Created JSON file: test.json, 0 empty fields
+2025-06-03 19:13:37,406 - INFO - Edited JSON file: test.json
+2025-06-03 19:13:56,278 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:15:42,407 - DEBUG - Set current field: Text via double-click
+2025-06-03 19:15:42,416 - DEBUG - Updated focus order for tab 3
+2025-06-03 19:15:43,025 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:15:43,035 - DEBUG - Updated focus order for tab 2
+2025-06-03 19:15:48,405 - INFO - Saved image: C:\Users\Hai\Desktop\dethib1\images\Pages_from__telc_pru_fung_b1_2025__01.jpg, relative path: \images\Pages_from__telc_pru_fung_b1_2025__01.jpg
+2025-06-03 19:15:48,410 - WARNING - Renamed image from Pages from [telc prüfung b1 2025]_01.jpg to Pages_from__telc_pru_fung_b1_2025__01.jpg due to invalid characters
+2025-06-03 19:15:51,184 - INFO - Button 'Chỉnh sửa JSON' clicked
+2025-06-03 19:15:51,231 - INFO - Created JSON file: test.json, 0 empty fields
+2025-06-03 19:15:52,933 - INFO - Edited JSON file: test.json
+2025-06-03 19:16:47,473 - DEBUG - K pressed
+2025-06-03 19:16:47,786 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:16:47,798 - DEBUG - Inserted 'C:\Users\Hai\Desktop\dethib1' into Entry
+2025-06-03 19:16:47,825 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:16:47,833 - DEBUG - Moved to next field: index 1
+2025-06-03 19:16:47,842 - DEBUG - K pressed
+2025-06-03 19:16:48,168 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:16:48,178 - DEBUG - Inserted 'C:\Users\Hai\Desktop\dethib1' into Entry
+2025-06-03 19:16:48,205 - DEBUG - Set current field: Entry via double-click
+2025-06-03 19:16:48,216 - DEBUG - Moved to next field: index 2
+2025-06-03 19:23:27,900 - DEBUG - K pressed
+2025-06-03 19:23:28,211 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:23:28,220 - WARNING - Clipboard is empty
+2025-06-03 19:23:28,229 - DEBUG - K pressed
+2025-06-03 19:23:28,542 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:23:28,551 - WARNING - Clipboard is empty
+2025-06-03 19:23:40,933 - DEBUG - K pressed
+2025-06-03 19:23:41,246 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:23:41,257 - WARNING - Clipboard is empty
+2025-06-03 19:23:41,267 - DEBUG - K pressed
+2025-06-03 19:23:41,577 - DEBUG - Simulated Ctrl+C
+2025-06-03 19:23:41,591 - WARNING - Clipboard is empty
