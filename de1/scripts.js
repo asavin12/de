@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Leseverstehen Teil 3
             const teil3Image = document.getElementById('leseverstehen_teil3_image');
-            teil3Image.src = `/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
+            teil3Image.src = `/de/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
             const teil3Div = document.getElementById('leseverstehen_teil3_situations');
             data.leseverstehen_teil3.situations.forEach((situation, index) => {
                 const questionDiv = document.createElement('div');
