@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telc B1 Test - Đề 1</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-old-paper">
+    <div class="card-container shadow-old-paper paper-textured">
+        <h1 class="text-old-text">Telc B1 Test - Đề 1</h1>
+
+        <h2>Leseverstehen Teil 1</h2>
+        <p>Chọn tiêu đề phù hợp cho mỗi đoạn văn.</p>
+        <div id="leseverstehen_teil1"></div>
+
+        <h2>Leseverstehen Teil 2</h2>
+        <div id="leseverstehen_teil2_content" class="content"></div>
+        <div id="leseverstehen_teil2_questions"></div>
+
+        <h2>Leseverstehen Teil 3</h2>
+        <p>Chọn tùy chọn phù hợp với mỗi tình huống dựa trên hình ảnh.</p>
+        <img id="leseverstehen_teil3_image" alt="Leseverstehen Teil 3 Image">
+        <div id="leseverstehen_teil3_situations"></div>
+
+        <h2>Sprachbausteine Teil 1</h2>
+        <div id="sprachbausteine_teil1_content" class="content"></div>
+        <div id="sprachbausteine_teil1_questions"></div>
+
+        <h2>Sprachbausteine Teil 2</h2>
+        <div id="sprachbausteine_teil2_content" class="content"></div>
+        <div id="sprachbausteine_teil2_questions"></div>
+
+        <button id="checkAnswers" class="bg-brown-600">Kiểm tra</button>
+        <div id="result" class="text-old-text"></div>
+    </div>
+
+    <!-- Modal cho hình ảnh phóng to -->
+    <div class="image-modal" id="imageModal">
+        <img id="modalImage" alt="Zoomed Image">
+        <button class="close-button" id="closeModal">×</button>
+    </div>
+
+    <script>
+        // Xử lý phóng to hình ảnh
+        document.getElementById('leseverstehen_teil3_image').addEventListener('click', function() {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = this.src;
+            modal.style.display = 'flex';
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('imageModal').style.display = 'none';
+        });
+
+        // Đóng modal khi nhấn ngoài hình ảnh
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    </script>
+    <script src="scripts.js"></script>
+</body>
+</html>
