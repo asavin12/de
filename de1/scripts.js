@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `Translate the following German text to Vietnamese with exact meaning, preserving context and nuances: "${text}"`
+                            text: `Bạn là chuyên gia dịch thuật từ Tiếng Đức sang Tiếng Việt, vì vậy chỉ đưa ra nghĩa Tiếng Việt chính xác 1:1 như từ điển không giải thích gì thêm(có thể đưa ra thêm một vài nghĩa) cho từ Tiếng Đức "${text}"`
                         }]
                     }],
                     generationConfig: {
