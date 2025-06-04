@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: `Bạn là chuyên gia dịch thuật từ Tiếng Đức sang Tiếng Việt, vì vậy chỉ đưa ra nghĩa Tiếng Việt chính xác 1:1 như từ điển không giải thích gì thêm(có thể đưa ra thêm một vài nghĩa) cho từ Tiếng Đức "${text}"`
+                            text: `Translate the following German text to Vietnamese with exact meaning, preserving context and nuances: "${text}"`
                         }]
                     }],
                     generationConfig: {
@@ -94,20 +94,54 @@ document.addEventListener('DOMContentLoaded', () => {
         return tryTranslateWithKey(text);
     }
 
-    // Hàm chọn từ gần nhất
-    function selectWordAtPoint(x, y) {
-        const range = document.caretRangeFromPoint(x, y);
-        if (!range) return false;
+    // Hàm chọn từ hoặc ký tự tại vị trí chạm
+    function selectTextAtPoint(x, y) {
+        const element = document.elementFromPoint(x, y);
+        if (!element || !element.closest('.content')) return false;
 
-        const textNode = range.startContainer;
-        if (textNode.nodeType !== Node.TEXT_NODE) return false;
+        // Tìm node văn bản gần nhất
+        let textNode = null;
+        let offset = 0;
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+            acceptNode: node => node.parentElement.closest('.content') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+        });
+        let currentNode = walker.currentNode;
+        while (currentNode) {
+            const range = document.createRange();
+            range.selectNodeContents(currentNode);
+            const rects = range.getClientRects();
+            for (let rect of rects) {
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    textNode = currentNode;
+                    const tempRange = document.createRange();
+                    tempRange.selectNodeContents(textNode);
+                    for (let i = 0; i < textNode.length; i++) {
+                        tempRange.setStart(textNode, i);
+                        tempRange.setEnd(textNode, i + 1);
+                        const charRect = tempRange.getBoundingClientRect();
+                        if (x >= charRect.left && x <= charRect.right && y >= charRect.top && y <= charRect.bottom) {
+                            offset = i;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            if (textNode) break;
+            currentNode = walker.nextNode();
+        }
 
-        const offset = range.startOffset;
+        if (!textNode) return false;
+
+        // Chọn từ hoặc ký tự
         const text = textNode.textContent;
-        let start = offset, end = offset;
+        let start = offset, end = offset + 1;
 
-        while (start > 0 && /\w/.test(text[start - 1])) start--;
-        while (end < text.length && /\w/.test(text[end])) end++;
+        // Thử chọn từ
+        if (/\w/.test(text[offset])) {
+            while (start > 0 && /\w/.test(text[start - 1])) start--;
+            while (end < text.length && /\w/.test(text[end])) end--;
+        }
 
         const newRange = document.createRange();
         newRange.setStart(textNode, start);
@@ -122,41 +156,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Xử lý chọn và dịch
     let currentSelectionRange = null;
+    let touchStartTime = 0;
     function handleTextSelection(e) {
         if (e.type === 'touchstart') {
-            e.preventDefault();
+            touchStartTime = Date.now();
             const touch = e.touches[0];
-            if (selectWordAtPoint(touch.clientX, touch.clientY)) {
-                const selection = window.getSelection();
-                currentSelectionRange = selection.getRangeAt(0);
-            }
+            setTimeout(() => {
+                if (selectTextAtPoint(touch.clientX, touch.clientY)) {
+                    const selection = window.getSelection();
+                    if (!selection.isCollapsed) {
+                        currentSelectionRange = selection.getRangeAt(0);
+                    }
+                }
+            }, 100); // Delay nhẹ để tránh chạm nhầm
         } else if (e.type === 'touchend') {
-            e.preventDefault();
+            e.preventDefault(); // Chặn menu ngữ cảnh
             const touch = e.changedTouches[0];
-            const selection = window.getSelection();
-            if (!selection.isCollapsed && currentSelectionRange) {
-                const range = document.caretRangeFromPoint(touch.clientX, touch.clientY);
-                if (range && currentSelectionRange.intersectsNode(range.startContainer)) {
-                    const selectedText = selection.toString().trim();
-                    if (selectedText) {
-                        const rect = currentSelectionRange.getBoundingClientRect();
-                        let x = rect.left + window.scrollX;
-                        let y = rect.bottom + window.scrollY + 5;
+            const duration = Date.now() - touchStartTime;
+            if (duration < 500 && currentSelectionRange) { // Chạm ngắn để dịch
+                const selection = window.getSelection();
+                if (!selection.isCollapsed) {
+                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (element && currentSelectionRange.intersectsNode(element)) {
+                        const selectedText = selection.toString().trim();
+                        if (selectedText) {
+                            const rect = currentSelectionRange.getBoundingClientRect();
+                            let x = rect.left + window.scrollX;
+                            let y = rect.bottom + window.scrollY + 5;
 
-                        const tooltipWidth = 250;
-                        if (x + tooltipWidth > window.innerWidth) {
-                            x = window.innerWidth - tooltipWidth - 10;
+                            const tooltipWidth = 250;
+                            if (x + tooltipWidth > window.innerWidth) {
+                                x = window.innerWidth - tooltipWidth - 10;
+                            }
+                            if (x < 10) x = 10;
+
+                            translationTooltip.style.top = `${y}px`;
+                            translationTooltip.style.left = `${x}px`;
+                            translationTooltip.textContent = 'Đang dịch...';
+                            translationTooltip.style.display = 'block';
+
+                            translateText(selectedText).then(translation => {
+                                translationTooltip.textContent = translation;
+                            });
                         }
-                        if (x < 10) x = 10;
-
-                        translationTooltip.style.top = `${y}px`;
-                        translationTooltip.style.left = `${x}px`;
-                        translationTooltip.textContent = 'Đang dịch...';
-                        translationTooltip.style.display = 'block';
-
-                        translateText(selectedText).then(translation => {
-                            translationTooltip.textContent = translation;
-                        });
                     }
                 }
             }
@@ -191,24 +233,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Chặn menu ngữ cảnh
-    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => {
+        if (e.target.closest('.content')) {
+            e.preventDefault();
+        }
+    });
 
     // Sự kiện mobile
-    document.addEventListener('touchstart', handleTextSelection);
-    document.addEventListener('touchend', handleTextSelection);
+    document.addEventListener('touchstart', handleTextSelection, { passive: false });
+    document.addEventListener('touchend', handleTextSelection, { passive: false });
 
     // Sự kiện PC
     document.addEventListener('mouseup', handleTextSelection);
 
     // Ẩn tooltip khi click/chạm ra ngoài
     document.addEventListener('mousedown', (e) => {
-        if (!translationTooltip.contains(e.target)) {
+        if (!translationTooltip.contains(e.target) && !e.target.closest('.content')) {
             translationTooltip.style.display = 'none';
             window.getSelection().removeAllRanges();
         }
     });
     document.addEventListener('touchstart', (e) => {
-        if (!translationTooltip.contains(e.target)) {
+        if (!translationTooltip.contains(e.target) && !e.target.closest('.content')) {
             translationTooltip.style.display = 'none';
             window.getSelection().removeAllRanges();
         }
@@ -228,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
                 questionDiv.innerHTML = `
-                    <p class="content"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
+                    <p class="font-medium"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
                     <div class="option-grid">
                         ${data.leseverstehen_teil1.overschriften.map((opt, optIdx) => `
                             <label>
@@ -265,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Leseverstehen Teil 3
             const teil3Image = document.getElementById('leseverstehen_teil3_image');
-            teil3Image.src = `/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
+            teil3Image.src = `/de/images/${data.leseverstehen_teil3.image_path.replace(/\\/g, '/').replace(/^\/+/, '').replace(/^images\//, '')}`;
             const teil3Div = document.getElementById('leseverstehen_teil3_situations');
             data.leseverstehen_teil3.situations.forEach((situation, index) => {
                 const questionDiv = document.createElement('div');
@@ -326,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                 `;
                 sprach2QuestionsDiv.appendChild(questionDiv);
-            }
+            };
 
             // Kiểm tra đáp án
             document.getElementById('checkAnswers').addEventListener('click', () => {
