@@ -63,14 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                if (response.status === 429) {
+                if (response.status === 429 || response.status === 401) {
                     failedKeys.add(currentKeyIndex);
                     currentKeyIndex = (currentKeyIndex + 1) % encodedApiKeys.length;
                     return tryTranslateWithKey(text); // Thử key tiếp theo
-                } else if (response.status === 401) {
-                    failedKeys.add(currentKeyIndex);
-                    currentKeyIndex = (currentKeyIndex + 1) % encodedApiKeys.length;
-                    return tryTranslateWithKey(text); // Thử key tiếp theo nếu 401
                 }
                 throw new Error(`API error: ${response.statusText}`);
             }
@@ -89,9 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Hàm dịch văn bản
+    // Hàm dịch văn bản (bỏ giới hạn >= 2 ký tự)
     async function translateText(text) {
-        if (text.length < 2) return '';
+        if (!text) return ''; // Chỉ kiểm tra văn bản không rỗng
         // Kiểm tra cache
         if (translationCache.has(text)) {
             return translationCache.get(text);
@@ -99,15 +95,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return tryTranslateWithKey(text);
     }
 
-    // Xử lý bôi đen văn bản
-    document.addEventListener('mouseup', async (e) => {
+    // Hàm xử lý chọn văn bản (PC và Mobile)
+    async function handleTextSelection(e) {
         const selection = window.getSelection();
         const selectedText = selection.toString().trim();
-        if (selectedText && selectedText.length >= 2) {
-            const range = selection.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-            translationTooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
-            translationTooltip.style.left = `${rect.left + window.scrollX}px`;
+        if (selectedText) {
+            let x, y;
+            // Xử lý vị trí cho mobile (touch) hoặc PC (mouse)
+            if (e.type === 'touchend' && e.changedTouches && e.changedTouches[0]) {
+                x = e.changedTouches[0].clientX;
+                y = e.changedTouches[0].clientY + window.scrollY + 5;
+                // Ngăn menu ngữ cảnh mặc định trên mobile
+                e.preventDefault();
+            } else {
+                const range = selection.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+                x = rect.left + window.scrollX;
+                y = rect.bottom + window.scrollY + 5;
+            }
+
+            // Điều chỉnh vị trí tooltip để không tràn màn hình
+            const tooltipWidth = 250; // max-width của tooltip trên mobile
+            if (x + tooltipWidth > window.innerWidth) {
+                x = window.innerWidth - tooltipWidth - 10;
+            }
+            if (x < 10) x = 10;
+
+            translationTooltip.style.top = `${y}px`;
+            translationTooltip.style.left = `${x}px`;
             translationTooltip.textContent = 'Đang dịch...';
             translationTooltip.style.display = 'block';
 
@@ -116,10 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             translationTooltip.style.display = 'none';
         }
-    });
+    }
 
-    // Ẩn tooltip khi click ra ngoài
+    // Sự kiện cho PC
+    document.addEventListener('mouseup', handleTextSelection);
+
+    // Sự kiện cho mobile
+    document.addEventListener('touchend', handleTextSelection);
+
+    // Ẩn tooltip khi click/chạm ra ngoài
     document.addEventListener('mousedown', (e) => {
+        if (!translationTooltip.contains(e.target)) {
+            translationTooltip.style.display = 'none';
+        }
+    });
+    document.addEventListener('touchstart', (e) => {
         if (!translationTooltip.contains(e.target)) {
             translationTooltip.style.display = 'none';
         }
@@ -139,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question';
                 questionDiv.innerHTML = `
-                    <p class="content"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
+                    <p class="font-medium"><span class="question-number">${index + 1}.</span> ${text.replace(/\r\n/g, '<br>')}</p>
                     <div class="option-grid">
                         ${data.leseverstehen_teil1.overschriften.map((opt, optIdx) => `
                             <label>
@@ -309,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (selected === data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)]) {
                         score++;
                         questionDiv.classList.add('correct');
-                        document.getElementById(`sprach2_${i + 31}`).textContent = data.sprachbausteine_teil1.options[i][data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)].charCodeAt(0) - 65];
+                        document.getElementById(`sprach2_${i + 31}`).textContent = data.sprachbausteine_teil2.options[data.answers[i + (data.leseverstehen_teil1.texts.length + data.leseverstehen_teil2.questions.length + data.leseverstehen_teil3.situations.length + data.sprachbausteine_teil1.options.length)].charCodeAt(0) - 65];
                     } else {
                         questionDiv.classList.add('incorrect');
                         document.getElementById(`sprach2_${i + 31}`).textContent = selected ? data.sprachbausteine_teil2.options[selected.charCodeAt(0) - 65] : '';
